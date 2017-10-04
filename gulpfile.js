@@ -13,6 +13,7 @@ var yargs = require("yargs").argv;
 var unicorn = require("./scripts/unicorn.js");
 var habitat = require("./scripts/habitat.js");
 var helix = require("./scripts/helix.js");
+var codeGen = require('rainbow-js-codegeneration').generationPlugin;
 
 var config;
 if (fs.existsSync('./gulp-config.js.user')) {
@@ -66,6 +67,7 @@ gulp.task("02-Nuget-Restore", function (callback) {
 
 gulp.task("03-Publish-All-Projects", function (callback) {
   return runSequence(
+    "Generate-Code",
     "Build-Solution",
     "Publish-Foundation-Projects",
     "Publish-Feature-Projects",
@@ -468,4 +470,17 @@ gulp.task("Package-Generate", function (callback) {
         "Package-Enumerate-Roles",
         "Package-Clean",
         callback);
+});
+
+gulp.task("Generate-Code", function (callback) {
+  gulp.src('**/codegeneration.config.js', { base: "./" })
+    .pipe(codeGen())
+    .pipe(rename(function (path) {
+      path.basename = "Templates.Generated";
+      path.extname = ".cs"
+    }))
+    .pipe(gulp.dest('./'))
+    .on("end", function () {
+      callback();
+    });
 });

@@ -241,3 +241,9 @@ results
 npm-debug.log
 .DS_Store
 
+# vagrant
+.vagrant
+
+# cake
+tools
+!tools/packages.config
